@@ -4,21 +4,32 @@ import Parse from '../parseConfig';
 const Feed = () => {
     const [posts, setPosts] = useState([]);
     const [content, setContent] = useState('');
+    let socket = {};
 
-    // Fetch posts from Parse server
-    const fetchPosts = async () => {
-        try {
-            const query = new Parse.Query('Post');
-            query.include('author');
-            const results = await query.find();
-            setPosts(results);
-        } catch (error) {
-            console.error('Error fetching posts:', error);
-        }
-    };
 
     useEffect(() => {
+
+        const fetchPosts = async () => {
+            try {
+                const query = new Parse.Query('Post');
+                socket = await query.subscribe();
+                query.include('author');
+                const results = await query.find();
+                setPosts(results);
+                socket.on('create', (post) => {
+                    console.log('New post received:', post);
+                    setPosts((prevPosts) => [post, ...prevPosts]);
+                });
+            } catch (error) {
+                console.error('Error fetching posts:', error);
+            }
+        };
         fetchPosts();
+
+
+        // return () => {
+        //     socket.unsubscribe();
+        // };
     }, []);
 
     // Handle liking a post
@@ -60,7 +71,6 @@ const Feed = () => {
             await post.save();
             // Clear content and refresh posts after successful post
             setContent('');
-            fetchPosts(); // Refresh the feed after posting
         } catch (error) {
             alert('Error: ' + error.message);
         }
