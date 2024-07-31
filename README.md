@@ -29,7 +29,7 @@ To get a local copy up and running follow these simple steps:
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/yourusername/ez-eats-app.git
+   git clone https://github.com/ammar1616/EzEatsApp.git
    ```
 2. Install npm packages
    ```sh
